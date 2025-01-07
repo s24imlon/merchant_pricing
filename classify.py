@@ -2,6 +2,7 @@ import pickle
 import pandas as pd
 import math
 import argparse 
+import warnings
 
 
 def extract_fees(fee_str):
@@ -89,6 +90,10 @@ def scale_data(test):
 
     X = test.drop(columns=["Fees (%)", "Current Provider"])
 
+    warnings.filterwarnings(
+        "ignore",
+        message="Trying to unpickle estimator .* from version .* when using version .*",
+    )
     with open('./scaler.pkl', 'rb') as f:
         sc = pickle.load(f)
         X_scaled = sc.transform(X)
@@ -98,7 +103,7 @@ def scale_data(test):
 
 def classify_fees(train_cluster_stats, test_dataset):
     """Gets classification labels"""
-    train_cluster_stats.reset_index(inplace=True)
+    train_cluster_stats.reset_index(drop = True, inplace=True)
 
     test_dataset = test_dataset.merge(train_cluster_stats[["cluster", "25%", "75%"]], left_on="cluster", right_on="cluster", how="left")
 
@@ -125,6 +130,7 @@ def get_results():
     X_scaled = scale_data(processed_test_data)
 
     # Load the KMeans model and assign clusters
+    
     with open('./kmeans.pkl', 'rb') as f:
         kmeans = pickle.load(f)
         processed_test_data["cluster"] = kmeans.predict(X_scaled)
