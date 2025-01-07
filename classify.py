@@ -45,7 +45,7 @@ def apply_log_transform(test, columns):
 
 
 def preprocess_data(test_file):
-    """Main preprocessing function."""
+    """Preprocess data."""
     # Define probabilities
     weights = {
         "mastercard": 0.4,
@@ -66,7 +66,7 @@ def preprocess_data(test_file):
     for fee_column in fee_columns:
         test[fee_column] = test[fee_column].apply(extract_fees)
 
-    # Adjust fees based on transaction amount
+    # Convert flat fee to percentage
     for fee_column in fee_columns:
         test[fee_column] = apply_fee_adjustment(test, fee_column, "Average Transaction Amount")
 
